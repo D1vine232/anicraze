@@ -1,0 +1,2070 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Anicraze — Anime Blog & Community</title>
+
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preload" as="image" href="assets/anicraze-logo.png">
+  <link rel="preload" as="image" href="assets/background.png">
+
+  <style>
+    :root{
+      --bg: #06050b;
+      --text: rgba(245, 245, 255, 0.92);
+      --muted: rgba(245,245,255,0.65);
+      --muted2: rgba(245,245,255,0.48);
+      --purple: #6f3cff;
+      --blue: #25b5ff;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 14px;
+      --ring: 0 0 0 3px rgba(37, 181, 255, 0.22), 0 0 0 1px rgba(111, 60, 255, 0.14) inset;
+
+      --bg-image: url("assets/background.png");
+      --bg-dim: 0.72;
+      --bg-blur: 6px;
+    }
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 600px at 18% 10%, rgba(111,60,255,.18), transparent 55%),
+        radial-gradient(900px 520px at 80% 18%, rgba(37,181,255,.12), transparent 55%),
+        radial-gradient(900px 700px at 55% 85%, rgba(111,60,255,.12), transparent 60%),
+        linear-gradient(180deg, #04030a, #05030b 40%, #03020a);
+      overflow-x:hidden;
+    }
+
+    .bg-layer{
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(var(--bg-blur)) saturate(0.85);
+      transform: scale(1.02);
+    }
+    .bg-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(1000px 600px at 18% 10%, rgba(111,60,255,.20), transparent 55%),
+        radial-gradient(900px 520px at 80% 18%, rgba(37,181,255,.14), transparent 55%),
+        radial-gradient(900px 700px at 55% 85%, rgba(111,60,255,.14), transparent 60%),
+        linear-gradient(180deg, rgba(4,3,10,var(--bg-dim)), rgba(5,3,11,var(--bg-dim)) 40%, rgba(3,2,10,var(--bg-dim)));
+    }
+
+    a{ color:inherit; }
+    .app{ min-height: 100%; display:flex; flex-direction:column; }
+
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(8,6,16,.78), rgba(8,6,16,.45));
+      border-bottom: 1px solid rgba(120, 90, 200, 0.20);
+    }
+    .topbar-inner{
+      max-width: 1180px; margin: 0 auto; padding: 14px 16px;
+      display:flex; align-items:center; gap:14px;
+    }
+
+    .logo{
+      display:flex; align-items:center; gap:10px;
+      cursor:pointer; user-select:none;
+      padding:10px 12px; border-radius: 16px;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .logo:hover{ background: rgba(111,60,255,.08); transform: translateY(-1px); }
+
+    .logo-img{
+      height: 34px;
+      width: auto;
+      border-radius: 10px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(10,8,18,.35);
+      display:block;
+    }
+    .logo:hover .logo-img{
+      box-shadow: 0 0 0 3px rgba(37,181,255,.18), 0 12px 34px rgba(0,0,0,.55);
+    }
+
+    .logo h1{
+      font-size: 15px; margin:0; letter-spacing: .4px; font-weight: 780;
+      display:flex; align-items:baseline; gap:7px;
+    }
+    .logo h1 span{ font-weight:600; font-size: 12px; color: var(--muted2); letter-spacing:.2px; }
+    @media (max-width: 520px){ .logo h1 span{ display:none; } }
+
+    .nav{ display:flex; align-items:center; gap:8px; margin-left:auto; flex-wrap:wrap; }
+    .tab{
+      border: 1px solid rgba(120, 90, 200, 0.22);
+      background: rgba(10,8,18,.35);
+      color: var(--muted);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: background .12s ease, transform .12s ease, border-color .12s ease, color .12s ease;
+      font-weight: 650;
+      font-size: 13px;
+      display:flex; align-items:center; gap:8px;
+      user-select:none;
+    }
+    .tab:hover{
+      background: rgba(111,60,255,.10);
+      border-color: rgba(37,181,255,.22);
+      transform: translateY(-1px);
+      color: var(--text);
+    }
+    .tab.active{
+      background: linear-gradient(135deg, rgba(111,60,255,.20), rgba(37,181,255,.12));
+      border-color: rgba(37,181,255,.30);
+      color: var(--text);
+      box-shadow: var(--ring);
+    }
+
+    .container{ max-width: 1180px; margin: 0 auto; padding: 22px 16px 60px; width:100%; }
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    @media (max-width: 960px){ .hero{ grid-template-columns: 1fr; } }
+
+    .card{
+      background: linear-gradient(180deg, rgba(20, 12, 36, 0.84), rgba(10, 8, 18, 0.70));
+      border: 1px solid rgba(120, 90, 200, 0.22);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card-header{
+      padding: 16px 16px 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom: 1px solid rgba(120, 90, 200, 0.16);
+      background: linear-gradient(135deg, rgba(111,60,255,.12), rgba(37,181,255,.06));
+    }
+    .card-header h2{ margin:0; font-size: 15px; font-weight: 780; letter-spacing:.2px; }
+    .card-header p{ margin:6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .card-body{ padding: 14px 16px 16px; }
+
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+    @media (max-width: 960px){ .grid2{ grid-template-columns: 1fr; } }
+
+    .btn{
+      border: 1px solid rgba(37,181,255,.22);
+      background: linear-gradient(135deg, rgba(111,60,255,.20), rgba(37,181,255,.12));
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease;
+      font-weight: 760;
+      font-size: 13px;
+      user-select:none;
+      white-space:nowrap;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.secondary{
+      background: rgba(10,8,18,.35);
+      border: 1px solid rgba(120, 90, 200, 0.22);
+      color: var(--muted);
+    }
+    .btn.danger{
+      background: rgba(255,77,109,.10);
+      border-color: rgba(255,77,109,.22);
+      color: rgba(255,200,210,.95);
+    }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none !important;
+      filter:none !important;
+    }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .controls > *{ flex: 1 1 160px; min-width: 160px; }
+    .controls .tight{ flex: 0 0 auto; min-width:auto; }
+
+    input, textarea, select{
+      width:100%;
+      background: rgba(6,5,12,.55);
+      border: 1px solid rgba(120, 90, 200, 0.25);
+      border-radius: 14px;
+      padding: 11px 12px;
+      color: var(--text);
+      outline:none;
+      transition: box-shadow .12s ease, border-color .12s ease;
+      font-size: 13px;
+    }
+    textarea{ min-height: 110px; resize: vertical; }
+    input:focus, textarea:focus, select:focus{ box-shadow: var(--ring); border-color: rgba(37,181,255,.32); }
+    label{
+      display:block;
+      margin: 10px 0 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing:.2px;
+    }
+
+    .muted{ color: var(--muted); }
+    .tiny{ font-size: 12px; color: var(--muted2); }
+    .sep{ height:1px; background: rgba(120, 90, 200, 0.16); margin: 14px 0; }
+
+    .post{
+      padding: 14px 14px 12px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(12,10,22,.78), rgba(7,6,14,.75));
+      border: 1px solid rgba(120, 90, 200, 0.20);
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+    }
+    .post + .post{ margin-top: 12px; }
+
+    .post-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .post h3{ margin:0; font-size: 14px; font-weight: 820; letter-spacing:.2px; }
+    .meta{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted2);
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .badge{
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(37,181,255,.20);
+      background: rgba(5,8,18,.35);
+      color: rgba(240,240,255,.85);
+      font-weight: 750;
+    }
+    .badge.tag{
+      border-color: rgba(111,60,255,.26);
+      background: rgba(111,60,255,.10);
+    }
+    .badge.cat{
+      border-color: rgba(255, 209, 102, .25);
+      background: rgba(255, 209, 102, .08);
+    }
+
+    .post p{
+      margin: 10px 0 0;
+      color: rgba(245,245,255,.82);
+      line-height: 1.55;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .inline-actions{ display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap:wrap; }
+
+    .vote{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(37,181,255,.18);
+      background: rgba(8,10,20,.25);
+      color: rgba(245,245,255,.88);
+      font-weight: 800;
+      font-size: 13px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .vote:hover{
+      transform: translateY(-1px);
+      border-color: rgba(37,181,255,.28);
+      background: rgba(8,10,20,.35);
+    }
+    .vote:active{ transform: translateY(0); }
+    .vote.disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none !important;
+    }
+    .vote.on{
+      border-color: rgba(46,229,157,.22);
+      background: rgba(46,229,157,.08);
+    }
+
+    .cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap:10px; }
+    @media (max-width: 1100px){ .cal-grid{ grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px){ .cal-grid{ grid-template-columns: 1fr; } }
+
+    .day{
+      border-radius: 16px;
+      border: 1px solid rgba(120, 90, 200, 0.20);
+      background: rgba(6,5,12,.38);
+      overflow:hidden;
+      min-height: 140px;
+    }
+    .day-head{
+      padding: 10px 10px 9px;
+      border-bottom: 1px solid rgba(120, 90, 200, 0.14);
+      background: linear-gradient(135deg, rgba(111,60,255,.10), rgba(37,181,255,.06));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .day-head .dname{ font-weight: 850; font-size: 12px; letter-spacing:.25px; }
+    .day-head .ddate{ font-size: 11px; color: var(--muted2); font-weight: 700; }
+
+    .airings{
+      padding: 10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      max-height: 290px;
+      overflow:auto;
+    }
+    .airing{
+      border-radius: 14px;
+      border: 1px solid rgba(37,181,255,.14);
+      background: rgba(8,10,20,.35);
+      padding: 9px 9px;
+    }
+    .airing .title{ font-weight: 800; font-size: 12px; margin:0; line-height: 1.2; }
+    .airing .sub{
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted2);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-weight: 650;
+    }
+
+    .profile{
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid rgba(120, 90, 200, 0.22);
+      box-shadow: var(--shadow);
+      background: rgba(10,8,18,.35);
+    }
+    .banner{
+      height: 140px;
+      background:
+        radial-gradient(1000px 240px at 15% 30%, rgba(111,60,255,.35), transparent 50%),
+        radial-gradient(900px 200px at 80% 20%, rgba(37,181,255,.25), transparent 52%),
+        linear-gradient(135deg, rgba(10,8,18,.85), rgba(6,5,12,.65));
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid rgba(120, 90, 200, 0.16);
+      position:relative;
+    }
+    .banner:after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.35));
+    }
+    .profile-inner{ padding: 14px 16px 16px; display:flex; gap:14px; align-items:flex-start; }
+    .avatar{
+      width:72px;height:72px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.28), transparent 65%),
+        linear-gradient(135deg, rgba(111,60,255,.55), rgba(37,181,255,.35));
+      box-shadow: 0 14px 50px rgba(0,0,0,.45);
+      background-size: cover;
+      background-position:center;
+      flex: 0 0 auto;
+      margin-top:-44px;
+      position:relative;
+      z-index:2;
+    }
+    .profile-meta h3{ margin: 2px 0 0; font-size: 16px; font-weight: 900; }
+    .profile-meta .line{
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .toast{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      max-width: min(420px, calc(100vw - 32px));
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(37,181,255,.22);
+      background: rgba(10,8,18,.72);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      color: rgba(245,245,255,.92);
+      display:none;
+      z-index: 50;
+    }
+    .toast.show{ display:block; }
+    .toast .t-title{ font-weight: 900; font-size: 13px; }
+    .toast .t-msg{ margin-top: 6px; font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .footnote{ margin-top: 14px; font-size: 12px; color: var(--muted2); line-height: 1.45; }
+
+    .modal-backdrop{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+    .modal-backdrop.show{ display:flex; }
+
+    .modal{
+      width: min(760px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(120, 90, 200, 0.24);
+      background: linear-gradient(180deg, rgba(20, 12, 36, 0.92), rgba(10, 8, 18, 0.88));
+      box-shadow: 0 22px 80px rgba(0,0,0,.65);
+      overflow: hidden;
+    }
+    .modal-header{
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom: 1px solid rgba(120, 90, 200, 0.16);
+      background: linear-gradient(135deg, rgba(111,60,255,.14), rgba(37,181,255,.08));
+    }
+    .modal-title{
+      margin:0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+    .modal-close{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(120, 90, 200, 0.22);
+      background: rgba(10,8,18,.35);
+      color: rgba(245,245,255,.85);
+      cursor:pointer;
+      font-size: 16px;
+      font-weight: 900;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .modal-close:hover{ filter: brightness(1.07); transform: translateY(-1px); }
+    .modal-body{ padding: 14px 16px 16px; }
+
+    .splash{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(800px 500px at 20% 20%, rgba(111,60,255,.22), transparent 60%),
+        radial-gradient(700px 450px at 80% 20%, rgba(37,181,255,.16), transparent 60%),
+        rgba(0,0,0,.78);
+      backdrop-filter: blur(14px);
+      transition: opacity .28s ease, transform .28s ease;
+    }
+    .splash.hide{
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+    }
+    .splash-card{
+      width: min(420px, calc(100vw - 40px));
+      border-radius: 20px;
+      border: 1px solid rgba(120, 90, 200, 0.25);
+      background: linear-gradient(180deg, rgba(20, 12, 36, 0.92), rgba(10, 8, 18, 0.88));
+      box-shadow: 0 22px 80px rgba(0,0,0,.65);
+      padding: 18px 18px 16px;
+      text-align: center;
+    }
+    .splash-logo{
+      width: 92px;
+      height: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 16px 50px rgba(0,0,0,.55);
+    }
+    .splash-title{
+      margin-top: 12px;
+      font-weight: 900;
+      letter-spacing: .3px;
+      font-size: 16px;
+    }
+    .splash-sub{
+      margin-top: 6px;
+      font-size: 12px;
+      color: rgba(245,245,255,.68);
+    }
+    .splash-bar{
+      margin-top: 14px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(37,181,255,.20);
+      background: rgba(6,5,12,.45);
+      overflow:hidden;
+    }
+    .splash-bar-inner{
+      height: 100%;
+      width: 40%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(111,60,255,.45), rgba(37,181,255,.55));
+      animation: splashMove 1.1s ease-in-out infinite;
+    }
+    @keyframes splashMove{
+      0%{ transform: translateX(-20%); width: 30%; opacity:.7; }
+      50%{ transform: translateX(60%); width: 55%; opacity:1; }
+      100%{ transform: translateX(140%); width: 30%; opacity:.7; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-card">
+      <img class="splash-logo" src="assets/anicraze-logo.png" alt="Anicraze">
+      <div class="splash-title">Anicraze</div>
+      <div class="splash-sub">Loading your anime hub…</div>
+      <div class="splash-bar"><div class="splash-bar-inner"></div></div>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="logo" id="logoBtn" title="Back to Home">
+          <img class="logo-img" src="assets/anicraze-logo.png" alt="Anicraze logo">
+          <div>
+            <h1>Anicraze <span>anime blog • forum • news</span></h1>
+          </div>
+        </div>
+
+        <div class="nav" id="nav">
+          <div class="tab" data-route="home">Home</div>
+          <div class="tab" data-route="blog">Blog</div>
+          <div class="tab" data-route="forum">Forum</div>
+          <div class="tab" data-route="news">News</div>
+          <div class="tab" data-route="account">Account</div>
+        </div>
+      </div>
+    </div>
+
+    <main class="container" id="app"></main>
+
+    <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modalTitle">Modal</h3>
+          <button class="modal-close" id="modalCloseBtn" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <div class="t-title" id="toastTitle"></div>
+      <div class="t-msg" id="toastMsg"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // =========================
+    // Firebase (Auth + Firestore)
+    // =========================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      updatePassword
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      addDoc,
+      deleteDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      limit,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // TODO: PASTE YOUR FIREBASE CONFIG HERE (from Firebase Console)
+    const firebaseConfig = {
+      // apiKey: "...",
+      // authDomain: "...",
+      // projectId: "...",
+      // storageBucket: "...",
+      // messagingSenderId: "...",
+      // appId: "..."
+    };
+
+    const fbApp = initializeApp(firebaseConfig);
+    const auth = getAuth(fbApp);
+    const db = getFirestore(fbApp);
+
+    // =========================
+    // Helpers + UI basics
+    // =========================
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    function toast(title, msg){
+      const t = $("#toast");
+      $("#toastTitle").textContent = title;
+      $("#toastMsg").textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => t.classList.remove("show"), 3200);
+    }
+
+    function escapeHTML(str){
+      return (str ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function shortText(text, max=240){
+      const t = (text ?? "").trim();
+      if(t.length <= max) return { short: t, isShort: true };
+      return { short: t.slice(0, max).trimEnd() + "…", isShort: false };
+    }
+
+    function likesCount(obj){
+      if(!obj || typeof obj !== "object") return 0;
+      return Object.keys(obj).length;
+    }
+
+    function hasLiked(obj, uid){
+      if(!obj || !uid) return false;
+      return !!obj[uid];
+    }
+
+    function toggleLikeMap(obj, uid){
+      const m = (obj && typeof obj === "object") ? {...obj} : {};
+      if(m[uid]) delete m[uid]; else m[uid] = true;
+      return m;
+    }
+
+    function fmtDate(ts){
+      try{
+        // Firestore Timestamp -> Date
+        const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : new Date());
+        return d.toLocaleString(undefined, { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+      }catch{
+        return "";
+      }
+    }
+
+    // =========================
+    // Splash
+    // =========================
+    function hideSplash(){
+      const s = document.getElementById("splash");
+      if(!s) return;
+      s.classList.add("hide");
+      setTimeout(() => s.remove(), 420);
+    }
+    function initSplash(){
+      const assets = ["assets/anicraze-logo.png","assets/background.png"];
+      let loaded = 0;
+      const done = () => { loaded++; if(loaded >= assets.length) hideSplash(); };
+      setTimeout(hideSplash, 1800);
+      for(const src of assets){
+        const img = new Image();
+        img.onload = done;
+        img.onerror = done;
+        img.src = src;
+      }
+    }
+
+    // =========================
+    // Modal
+    // =========================
+    function openModal(title, bodyHTML){
+      const backdrop = $("#modalBackdrop");
+      $("#modalTitle").textContent = title;
+      $("#modalBody").innerHTML = bodyHTML;
+      backdrop.classList.add("show");
+      backdrop.setAttribute("aria-hidden", "false");
+    }
+    function closeModal(){
+      const backdrop = $("#modalBackdrop");
+      backdrop.classList.remove("show");
+      backdrop.setAttribute("aria-hidden", "true");
+      $("#modalBody").innerHTML = "";
+    }
+    function bindModal(){
+      $("#modalCloseBtn").onclick = closeModal;
+      $("#modalBackdrop").onclick = (e) => { if(e.target.id === "modalBackdrop") closeModal(); };
+      window.addEventListener("keydown", (e) => { if(e.key === "Escape") closeModal(); });
+    }
+
+    // =========================
+    // Routing
+    // =========================
+    const routes = ["home","blog","forum","news","account"];
+    function setActiveTab(route){
+      $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.route === route));
+    }
+    function navigate(route){
+      if(!routes.includes(route)) route = "home";
+      location.hash = "#" + route;
+    }
+    function currentRoute(){
+      const r = (location.hash || "#home").replace("#","");
+      return routes.includes(r) ? r : "home";
+    }
+
+    function cardHeader(title, subtitle, rightHTML=""){
+      return `
+        <div class="card-header">
+          <div>
+            <h2>${escapeHTML(title)}</h2>
+            ${subtitle ? `<p>${escapeHTML(subtitle)}</p>` : ""}
+          </div>
+          ${rightHTML}
+        </div>
+      `;
+    }
+
+    // =========================
+    // Auth state + Profile
+    // =========================
+    let authUser = null;       // Firebase auth user
+    let profile = null;        // Firestore users/{uid} doc
+
+    async function ensureProfile(u){
+      const ref = doc(db, "users", u.uid);
+      const snap = await getDoc(ref);
+      if(!snap.exists()){
+        const username = (u.email || "user").split("@")[0];
+        await setDoc(ref, {
+          uid: u.uid,
+          email: u.email || "",
+          username,
+          bio: "",
+          avatarUrl: "",
+          bannerUrl: "",
+          socials: { discord:"", x:"", anilist:"", mal:"" },
+          createdAt: serverTimestamp()
+        });
+      }
+      const snap2 = await getDoc(ref);
+      profile = snap2.data();
+    }
+
+    onAuthStateChanged(auth, async (u) => {
+      authUser = u;
+      profile = null;
+      if(u){
+        try{ await ensureProfile(u); }catch(e){ toast("Profile error", "Could not load your profile."); }
+      }
+      render();
+    });
+
+    // =========================
+    // Firestore realtime data
+    // =========================
+    let blogPosts = [];
+    let forumThreads = [];
+    let unsubBlog = null;
+    let unsubForum = null;
+
+    function startListeners(){
+      if(unsubBlog) unsubBlog();
+      if(unsubForum) unsubForum();
+
+      const bq = query(collection(db, "blogPosts"), orderBy("createdAt", "desc"), limit(100));
+      unsubBlog = onSnapshot(bq, (snap) => {
+        blogPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if(currentRoute() === "blog" || currentRoute() === "home") render();
+      });
+
+      const fq = query(collection(db, "forumThreads"), orderBy("createdAt", "desc"), limit(100));
+      unsubForum = onSnapshot(fq, (snap) => {
+        forumThreads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if(currentRoute() === "forum" || currentRoute() === "home") render();
+      });
+    }
+    startListeners();
+
+    // =========================
+    // AniList Calendar
+    // =========================
+    const ANILIST_ENDPOINT = "https://graphql.anilist.co";
+
+    function buildNext7Days(){
+      const days = [];
+      const start = new Date();
+      start.setHours(0,0,0,0);
+      for(let i=0; i<7; i++){
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        days.push(d);
+      }
+      return days;
+    }
+
+    function dayKeyLocal(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2,"0");
+      const d = String(date.getDate()).padStart(2,"0");
+      return `${y}-${m}-${d}`;
+    }
+
+    async function fetchAniListScheduleNext7Days(){
+      const nowSec = Math.floor(Date.now()/1000);
+      const weekSec = nowSec + 7*24*60*60;
+
+      const queryText = `
+        query ($airingAt_greater: Int, $airingAt_lesser: Int) {
+          Page(page: 1, perPage: 50) {
+            airingSchedules(
+              airingAt_greater: $airingAt_greater
+              airingAt_lesser: $airingAt_lesser
+              sort: AIRING_AT
+            ) {
+              airingAt
+              episode
+              media {
+                title { romaji english native }
+                siteUrl
+              }
+            }
+          }
+        }
+      `;
+
+      const res = await fetch(ANILIST_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept":"application/json" },
+        body: JSON.stringify({
+          query: queryText,
+          variables: { airingAt_greater: nowSec, airingAt_lesser: weekSec }
+        })
+      });
+
+      if(!res.ok) throw new Error("AniList schedule failed");
+      const json = await res.json();
+      const items = json?.data?.Page?.airingSchedules || [];
+
+      const grouped = new Map();
+      for(const it of items){
+        const airingDate = new Date(it.airingAt * 1000);
+        const key = dayKeyLocal(airingDate);
+
+        const title =
+          it?.media?.title?.english ||
+          it?.media?.title?.romaji ||
+          it?.media?.title?.native ||
+          "Untitled";
+
+        const entry = {
+          title,
+          url: it?.media?.siteUrl || "",
+          episode: it?.episode ?? null,
+          timeLocal: airingDate.toLocaleTimeString(undefined, { hour:"2-digit", minute:"2-digit" }),
+          airingAt: it.airingAt
+        };
+
+        if(!grouped.has(key)) grouped.set(key, []);
+        grouped.get(key).push(entry);
+      }
+
+      for(const [k, arr] of grouped.entries()){
+        arr.sort((a,b) => a.airingAt - b.airingAt);
+      }
+
+      return grouped;
+    }
+
+    // =========================
+    // Rendering helpers
+    // =========================
+    function editedLabel(editedAt){
+      if(!editedAt) return "";
+      return ` • edited ${fmtDate(editedAt)}`;
+    }
+
+    function renderBlogPost(p){
+      const s = shortText(p.content, 240);
+      const canExpand = !s.isShort;
+      const isOwner = authUser && p.authorId === authUser.uid;
+      const liked = authUser && hasLiked(p.likes, authUser.uid);
+
+      return `
+        <div class="post" data-blog-id="${escapeHTML(p.id)}">
+          <div class="post-top">
+            <div>
+              <h3>${escapeHTML(p.title || "Untitled")}</h3>
+              <div class="meta">
+                <span class="badge">BLOG</span>
+                <span class="tiny">${escapeHTML((p.authorName || "Unknown") + " • " + fmtDate(p.createdAt) + editedLabel(p.editedAt))}</span>
+              </div>
+            </div>
+            <div class="inline-actions">
+              <div class="vote ${authUser ? "" : "disabled"} ${liked ? "on" : ""}"
+                   title="${authUser ? "Like this post" : "Log in to like"}"
+                   data-action="like-blog"
+                   data-id="${escapeHTML(p.id)}">
+                ❤️ <span>${likesCount(p.likes)}</span>
+              </div>
+              ${canExpand ? `<button class="btn secondary" data-action="toggle" data-id="${escapeHTML(p.id)}" data-ns="blog">Expand</button>` : ``}
+              ${isOwner ? `<button class="btn secondary" data-action="edit-blog" data-id="${escapeHTML(p.id)}">Edit</button>` : ``}
+              ${isOwner ? `<button class="btn danger" data-action="delete-blog" data-id="${escapeHTML(p.id)}">Delete</button>` : ``}
+            </div>
+          </div>
+          <p data-content="${escapeHTML(p.id)}">${escapeHTML(s.short)}</p>
+        </div>
+      `;
+    }
+
+    function renderThread(t){
+      const s = shortText(t.content, 240);
+      const canExpand = !s.isShort;
+      const isOwner = authUser && t.authorId === authUser.uid;
+      const upvoted = authUser && hasLiked(t.upvotes, authUser.uid);
+      const comments = Array.isArray(t.comments) ? t.comments : [];
+
+      return `
+        <div class="post" data-thread="${escapeHTML(t.id)}">
+          <div class="post-top">
+            <div>
+              <h3>${escapeHTML(t.title || "Untitled")}</h3>
+              <div class="meta">
+                <span class="badge">THREAD</span>
+                <span class="badge cat">${escapeHTML(t.category || "General")}</span>
+                <span class="tiny">${escapeHTML((t.authorName || "Unknown") + " • " + fmtDate(t.createdAt) + editedLabel(t.editedAt))}</span>
+                <span class="tiny">💬 ${comments.length}</span>
+              </div>
+            </div>
+            <div class="inline-actions">
+              <div class="vote ${authUser ? "" : "disabled"} ${upvoted ? "on" : ""}"
+                   title="${authUser ? "Upvote thread" : "Log in to upvote"}"
+                   data-action="upvote-thread"
+                   data-id="${escapeHTML(t.id)}">
+                ⬆️ <span>${likesCount(t.upvotes)}</span>
+              </div>
+              ${canExpand ? `<button class="btn secondary" data-action="toggle" data-id="${escapeHTML(t.id)}" data-ns="forum">Expand</button>` : ``}
+              ${isOwner ? `<button class="btn secondary" data-action="edit-thread" data-id="${escapeHTML(t.id)}">Edit</button>` : ``}
+              ${isOwner ? `<button class="btn danger" data-action="delete-thread" data-id="${escapeHTML(t.id)}">Delete</button>` : ``}
+            </div>
+          </div>
+
+          <p data-content="${escapeHTML(t.id)}">${escapeHTML(s.short)}</p>
+
+          <div class="sep"></div>
+
+          <div>
+            <div class="tiny" style="margin-bottom:8px">${authUser ? "Add a comment" : "Log in to comment."}</div>
+            <div class="row">
+              <input data-comment-text="${escapeHTML(t.id)}" placeholder="${authUser ? "Write a comment…" : "Login required"}" maxlength="800" ${authUser ? "" : "disabled"} style="flex:2;min-width:220px" />
+              <button class="btn secondary" data-comment-btn="${escapeHTML(t.id)}" ${authUser ? "" : "disabled"}>Post</button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            ${
+              comments.length
+                ? comments.slice().sort((a,b)=>{
+                    const av = likesCount(b.upvotes) - likesCount(a.upvotes);
+                    if(av) return av;
+                    const ad = (a.createdAt?.seconds ?? 0);
+                    const bd = (b.createdAt?.seconds ?? 0);
+                    return bd - ad;
+                  }).slice(0, 10).map(c => {
+                    const isCrown = authUser && c.authorId === authUser.uid;
+                    const up = authUser && hasLiked(c.upvotes, authUser.uid);
+                    return `
+                      <div class="airing" style="margin-top:8px">
+                        <div class="post-top" style="align-items:center">
+                          <div>
+                            <div class="title">${escapeHTML(c.authorName || "Anonymous")}</div>
+                            <div class="sub">
+                              <span>${escapeHTML(fmtDate(c.createdAt) + editedLabel(c.editedAt))}</span>
+                              <span>Comment</span>
+                            </div>
+                          </div>
+                          <div class="inline-actions">
+                            <div class="vote ${authUser ? "" : "disabled"} ${up ? "on" : ""}"
+                                 title="${authUser ? "Upvote comment" : "Log in to upvote"}"
+                                 data-action="upvote-comment"
+                                 data-thread-id="${escapeHTML(t.id)}"
+                                 data-comment-id="${escapeHTML(c.id)}">
+                              ⬆️ <span>${likesCount(c.upvotes)}</span>
+                            </div>
+                            ${isCrown ? `<button class="btn secondary" data-action="edit-comment" data-thread-id="${escapeHTML(t.id)}" data-comment-id="${escapeHTML(c.id)}">Edit</button>` : ``}
+                            ${isCrown ? `<button class="btn danger" data-action="delete-comment" data-thread-id="${escapeHTML(t.id)}" data-comment-id="${escapeHTML(c.id)}">Delete</button>` : ``}
+                          </div>
+                        </div>
+                        <div class="tiny" style="margin-top:6px; white-space:pre-wrap">${escapeHTML(c.text || "")}</div>
+                      </div>
+                    `;
+                  }).join("")
+                : `<div class="tiny">No comments yet.</div>`
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================
+    // Pages
+    // =========================
+    function renderHome(){
+      const app = $("#app");
+      const greet = authUser ? `Welcome back, ${escapeHTML(profile?.username || "user")}.` : "Welcome to Anicraze.";
+      const topBlog = blogPosts.slice().sort((a,b)=> likesCount(b.likes)-likesCount(a.likes)).slice(0,4);
+      const topThreads = forumThreads.slice().sort((a,b)=> likesCount(b.upvotes)-likesCount(a.upvotes)).slice(0,4);
+
+      app.innerHTML = `
+        <div class="hero">
+          <div class="card">
+            ${cardHeader("Home", "Your anime hub — blog, forum, schedule, and news.")}
+            <div class="card-body">
+              <div class="row" style="justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div class="muted">${greet}</div>
+                  <div class="footnote">Calendar shows upcoming airings via AniList (times in your local time).</div>
+                </div>
+                <div class="row">
+                  <button class="btn" id="goBlog">Go to Blog</button>
+                  <button class="btn secondary" id="goNews">Go to News</button>
+                </div>
+              </div>
+
+              <div class="sep"></div>
+
+              <div class="row" style="justify-content:space-between">
+                <div>
+                  <div style="font-weight:900; letter-spacing:.2px;">📅 Anime Release Calendar</div>
+                  <div class="tiny">Next 7 days • real airings</div>
+                </div>
+                <div class="row">
+                  <button class="btn secondary" id="refreshCal">Refresh</button>
+                </div>
+              </div>
+
+              <div style="margin-top:12px" id="calWrap">
+                <div class="muted">Loading schedule…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            ${cardHeader("Trending", "Top picks right now (likes/upvotes).")}
+            <div class="card-body">
+              <div class="post">
+                <div class="post-top">
+                  <div>
+                    <h3>🔥 Top Blog Posts</h3>
+                    <div class="tiny">Based on likes</div>
+                  </div>
+                  <button class="btn secondary" id="openBlogFromTrending">Open Blog</button>
+                </div>
+                <div style="margin-top:10px">
+                  ${
+                    topBlog.length
+                      ? topBlog.map(p => `
+                        <div class="airing" style="margin-top:8px">
+                          <div class="title">${escapeHTML(p.title || "Untitled")}</div>
+                          <div class="sub"><span>${escapeHTML(p.authorName || "Unknown")}</span><span>❤️ ${likesCount(p.likes)}</span></div>
+                        </div>
+                      `).join("")
+                      : `<div class="tiny">No posts yet.</div>`
+                  }
+                </div>
+              </div>
+
+              <div class="post" style="margin-top:12px">
+                <div class="post-top">
+                  <div>
+                    <h3>⚡ Top Forum Threads</h3>
+                    <div class="tiny">Based on upvotes</div>
+                  </div>
+                  <button class="btn secondary" id="openForumFromTrending">Open Forum</button>
+                </div>
+                <div style="margin-top:10px">
+                  ${
+                    topThreads.length
+                      ? topThreads.map(t => `
+                        <div class="airing" style="margin-top:8px">
+                          <div class="title">${escapeHTML(t.title || "Untitled")}</div>
+                          <div class="sub"><span>${escapeHTML(t.category || "General")}</span><span>⬆️ ${likesCount(t.upvotes)}</span></div>
+                          <div class="tiny" style="margin-top:6px">${escapeHTML(t.authorName || "Unknown")}</div>
+                        </div>
+                      `).join("")
+                      : `<div class="tiny">No threads yet.</div>`
+                  }
+                </div>
+              </div>
+
+              <div class="footnote">Tip: Log in to like/upvote and help good content rise.</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      $("#goBlog").onclick = () => navigate("blog");
+      $("#goNews").onclick = () => navigate("news");
+      $("#openBlogFromTrending").onclick = () => navigate("blog");
+      $("#openForumFromTrending").onclick = () => navigate("forum");
+
+      const loadCalendar = async () => {
+        const wrap = $("#calWrap");
+        wrap.innerHTML = `<div class="muted">Loading schedule…</div>`;
+
+        try{
+          const grouped = await fetchAniListScheduleNext7Days();
+          const days = buildNext7Days();
+
+          wrap.innerHTML = `
+            <div class="cal-grid">
+              ${days.map(d => {
+                const key = dayKeyLocal(d);
+                const list = grouped.get(key) || [];
+                return `
+                  <div class="day">
+                    <div class="day-head">
+                      <div class="dname">${escapeHTML(d.toLocaleDateString(undefined,{weekday:"long"}))}</div>
+                      <div class="ddate">${escapeHTML(d.toLocaleDateString(undefined,{month:"short", day:"numeric"}))}</div>
+                    </div>
+                    <div class="airings">
+                      ${
+                        list.length === 0
+                          ? `<div class="tiny">No airings found.</div>`
+                          : list.slice(0, 16).map(a => `
+                            <div class="airing" title="${escapeHTML(a.title)}">
+                              <div class="title">
+                                ${escapeHTML(a.title)}${a.episode ? ` <span class="tiny">• Ep ${escapeHTML(a.episode)}</span>` : ""}
+                              </div>
+                              <div class="sub">
+                                <span>${escapeHTML(a.timeLocal)}</span>
+                                <span>${a.url ? `<a href="${a.url}" target="_blank" rel="noreferrer">AniList →</a>` : "—"}</span>
+                              </div>
+                            </div>
+                          `).join("")
+                      }
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+            <div class="footnote">Calendar data: AniList AiringSchedule (times shown in your local time).</div>
+          `;
+        }catch(e){
+          wrap.innerHTML = `
+            <div class="post">
+              <h3 style="margin:0 0 6px">Couldn’t load the schedule</h3>
+              <div class="tiny">If AniList is rate limiting, try again in a minute.</div>
+            </div>
+          `;
+        }
+      };
+
+      $("#refreshCal").onclick = loadCalendar;
+      loadCalendar();
+    }
+
+    function renderBlog(){
+      const app = $("#app");
+      const locked = !authUser;
+
+      app.innerHTML = `
+        <div class="grid2">
+          <div class="card">
+            ${cardHeader(
+              "Blog",
+              "Browse posts, search, sort. Login required to post/like.",
+              locked
+                ? `<button class="btn secondary" id="goAccountFromBlog">Log in to Post</button>`
+                : `<button class="btn" id="openBlogComposer">New Blog Post</button>`
+            )}
+            <div class="card-body">
+              <div class="controls">
+                <input id="blogSearch" placeholder="Search title, author…" />
+                <select id="blogSort">
+                  <option value="new">Sort: Newest</option>
+                  <option value="top">Sort: Top (Likes)</option>
+                </select>
+                <button class="btn secondary tight" id="blogClear">Clear</button>
+              </div>
+              <div class="sep"></div>
+              <div id="blogList"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            ${cardHeader("Tips", "Short by default. Expand to read full.")}
+            <div class="card-body">
+              <div class="post">
+                <h3 style="margin:0 0 8px">Rules</h3>
+                <div class="tiny">Be respectful • no spam • tag spoilers in forum.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if(locked){
+        $("#goAccountFromBlog").onclick = () => navigate("account");
+      }else{
+        $("#openBlogComposer").onclick = () => {
+          openModal("New Blog Post", `
+            <form id="blogModalForm">
+              <label>Title</label>
+              <input id="bTitle" required maxlength="90" placeholder="e.g., My thoughts on Episode 1…" />
+              <label>Post</label>
+              <textarea id="bContent" required maxlength="5000" placeholder="Write your blog post…"></textarea>
+              <div class="row" style="margin-top:12px;justify-content:flex-end">
+                <button class="btn secondary" type="button" id="cancelBlog">Cancel</button>
+                <button class="btn" type="submit">Publish</button>
+              </div>
+            </form>
+          `);
+
+          $("#cancelBlog").onclick = closeModal;
+
+          $("#blogModalForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const title = $("#bTitle").value.trim();
+            const content = $("#bContent").value.trim();
+            if(!title || !content){ toast("Missing info", "Title and content are required."); return; }
+
+            try{
+              await addDoc(collection(db, "blogPosts"), {
+                title,
+                content,
+                authorId: authUser.uid,
+                authorName: profile?.username || "user",
+                createdAt: serverTimestamp(),
+                editedAt: null,
+                likes: {}
+              });
+              closeModal();
+              toast("Posted!", "Your blog post is live.");
+            }catch{
+              toast("Error", "Could not publish post.");
+            }
+          };
+        };
+      }
+
+      function applyBlog(){
+        const q = ($("#blogSearch").value || "").trim().toLowerCase();
+        const sort = $("#blogSort").value;
+
+        let list = blogPosts.slice();
+        if(q){
+          list = list.filter(p => {
+            const hay = [p.title, p.authorName, p.content].join(" ").toLowerCase();
+            return hay.includes(q);
+          });
+        }
+        if(sort === "new") list.sort((a,b)=> (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+        if(sort === "top") list.sort((a,b)=> likesCount(b.likes)-likesCount(a.likes) || ((b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)));
+
+        $("#blogList").innerHTML = list.length ? list.map(renderBlogPost).join("") : `<div class="muted">No posts yet.</div>`;
+        attachExpandHandlers();
+        attachBlogActions();
+      }
+
+      $("#blogSearch").oninput = applyBlog;
+      $("#blogSort").onchange = applyBlog;
+      $("#blogClear").onclick = () => { $("#blogSearch").value=""; $("#blogSort").value="new"; applyBlog(); };
+
+      applyBlog();
+    }
+
+    function renderForum(){
+      const app = $("#app");
+      const locked = !authUser;
+      const categories = ["General","Seasonal","Recommendations","News","Help","Spoiler Zone","Memes"];
+
+      app.innerHTML = `
+        <div class="grid2">
+          <div class="card">
+            ${cardHeader(
+              "Forum",
+              "Threads + comments. Login required to post/comment/upvote.",
+              locked
+                ? `<button class="btn secondary" id="goAccountFromForum">Log in to Post</button>`
+                : `<button class="btn" id="openThreadComposer">New Thread</button>`
+            )}
+            <div class="card-body">
+              <div class="controls">
+                <input id="forumSearch" placeholder="Search title, author…" />
+                <select id="forumCategory">
+                  <option value="">All categories</option>
+                  ${categories.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("")}
+                </select>
+                <select id="forumSort">
+                  <option value="new">Sort: Newest</option>
+                  <option value="top">Sort: Top (Upvotes)</option>
+                </select>
+                <button class="btn secondary tight" id="forumClear">Clear</button>
+              </div>
+              <div class="sep"></div>
+              <div id="forumList"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            ${cardHeader("Forum Guide", "Be cool. Keep spoilers in Spoiler Zone.")}
+            <div class="card-body">
+              <div class="post">
+                <div class="tiny">${categories.map(c=>`<span class="badge cat">${escapeHTML(c)}</span>`).join(" ")}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if(locked){
+        $("#goAccountFromForum").onclick = () => navigate("account");
+      }else{
+        $("#openThreadComposer").onclick = () => {
+          openModal("New Thread", `
+            <form id="threadModalForm">
+              <label>Thread title</label>
+              <input id="fTitle" required maxlength="90" placeholder="e.g., Best opening themes?" />
+              <label>Category</label>
+              <select id="fCategory">
+                ${categories.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("")}
+              </select>
+              <label>Opening post</label>
+              <textarea id="fContent" required maxlength="5000" placeholder="Write the first message…"></textarea>
+              <div class="row" style="margin-top:12px;justify-content:flex-end">
+                <button class="btn secondary" type="button" id="cancelThread">Cancel</button>
+                <button class="btn" type="submit">Create Thread</button>
+              </div>
+            </form>
+          `);
+
+          $("#cancelThread").onclick = closeModal;
+
+          $("#threadModalForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const title = $("#fTitle").value.trim();
+            const content = $("#fContent").value.trim();
+            const category = $("#fCategory").value;
+            if(!title || !content){ toast("Missing info", "Title and opening post are required."); return; }
+
+            try{
+              await addDoc(collection(db, "forumThreads"), {
+                title,
+                content,
+                category,
+                authorId: authUser.uid,
+                authorName: profile?.username || "user",
+                createdAt: serverTimestamp(),
+                editedAt: null,
+                upvotes: {},
+                comments: []
+              });
+              closeModal();
+              toast("Thread created!", "Your thread is live.");
+            }catch{
+              toast("Error", "Could not create thread.");
+            }
+          };
+        };
+      }
+
+      function applyForum(){
+        const q = ($("#forumSearch").value || "").trim().toLowerCase();
+        const cat = ($("#forumCategory").value || "").trim();
+        const sort = $("#forumSort").value;
+
+        let list = forumThreads.slice();
+        if(q){
+          list = list.filter(t => ([t.title, t.authorName, t.content, t.category].join(" ").toLowerCase()).includes(q));
+        }
+        if(cat){
+          list = list.filter(t => (t.category || "General") === cat);
+        }
+        if(sort === "new") list.sort((a,b)=> (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+        if(sort === "top") list.sort((a,b)=> likesCount(b.upvotes)-likesCount(a.upvotes) || ((b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)));
+
+        $("#forumList").innerHTML = list.length ? list.map(renderThread).join("") : `<div class="muted">No threads yet.</div>`;
+        attachExpandHandlers();
+        attachForumActions();
+      }
+
+      $("#forumSearch").oninput = applyForum;
+      $("#forumCategory").onchange = applyForum;
+      $("#forumSort").onchange = applyForum;
+      $("#forumClear").onclick = () => { $("#forumSearch").value=""; $("#forumCategory").value=""; $("#forumSort").value="new"; applyForum(); };
+
+      applyForum();
+    }
+
+    async function renderNews(){
+      const app = $("#app");
+      const RSS_URL = "https://www.animenewsnetwork.com/news/rss.xml";
+      const RSS_TO_JSON = "https://api.rss2json.com/v1/api.json?rss_url=";
+
+      app.innerHTML = `
+        <div class="card">
+          ${cardHeader("News", "Latest anime news articles (clean list).",
+            `<button class="btn secondary" id="refreshNews">Refresh</button>`
+          )}
+          <div class="card-body" id="newsList">
+            <div class="muted">Loading news…</div>
+          </div>
+        </div>
+      `;
+
+      const strip = (html) => (html || "").replace(/<[^>]*>/g,"").trim();
+      const short = (txt, n=190) => {
+        const t = strip(txt);
+        return t.length > n ? t.slice(0,n).trimEnd() + "…" : t;
+      };
+
+      const loadNews = async () => {
+        const list = $("#newsList");
+        list.innerHTML = `<div class="muted">Loading news…</div>`;
+        try{
+          const url = RSS_TO_JSON + encodeURIComponent(RSS_URL);
+          const res = await fetch(url);
+          if(!res.ok) throw new Error("News fetch failed");
+          const json = await res.json();
+          const items = json?.items || [];
+
+          list.innerHTML = items.slice(0, 20).map(it => {
+            const title = it.title || "Untitled";
+            const link = it.link || "#";
+            const pub = it.pubDate ? new Date(it.pubDate) : null;
+            const desc = it.description || it.content || "";
+
+            return `
+              <div class="post">
+                <div class="post-top">
+                  <div>
+                    <h3>${escapeHTML(title)}</h3>
+                    <div class="meta">
+                      <span class="badge">NEWS</span>
+                      <span class="tiny">${pub ? escapeHTML(pub.toLocaleString(undefined,{year:"numeric",month:"short",day:"numeric"})) : "—"}</span>
+                    </div>
+                  </div>
+                  <div class="inline-actions">
+                    <a class="btn secondary" href="${link}" target="_blank" rel="noreferrer">Open</a>
+                  </div>
+                </div>
+                <p>${escapeHTML(short(desc) || "No description available.")}</p>
+              </div>
+            `;
+          }).join("") + `<div class="footnote">Source: Anime News Network RSS (converted to JSON for the browser).</div>`;
+        }catch(e){
+          $("#newsList").innerHTML = `
+            <div class="post">
+              <h3 style="margin:0 0 6px">Couldn’t load news</h3>
+              <div class="tiny">The RSS converter can rate-limit. Try refresh.</div>
+            </div>
+          `;
+        }
+      };
+
+      $("#refreshNews").onclick = loadNews;
+      loadNews();
+    }
+
+    function renderAccount(){
+      const app = $("#app");
+
+      if(!authUser){
+        app.innerHTML = `
+          <div class="grid2">
+            <div class="card">
+              ${cardHeader("Account", "Log in or create an account.")}
+              <div class="card-body">
+                <div class="post">
+                  <h3 style="margin:0 0 8px">Log in</h3>
+                  <label>Email</label>
+                  <input id="loginEmail" placeholder="you@example.com" />
+                  <label>Password</label>
+                  <input id="loginPass" type="password" placeholder="••••••••" />
+                  <div class="row" style="margin-top:12px;justify-content:flex-end">
+                    <button class="btn" id="loginBtn">Log in</button>
+                  </div>
+                </div>
+
+                <div class="sep"></div>
+
+                <div class="post">
+                  <h3 style="margin:0 0 8px">Create account</h3>
+                  <label>Email</label>
+                  <input id="regEmail" placeholder="you@example.com" />
+                  <label>Password</label>
+                  <input id="regPass" type="password" placeholder="Create a password" />
+                  <div class="row" style="margin-top:12px;justify-content:flex-end">
+                    <button class="btn secondary" id="registerBtn">Create</button>
+                  </div>
+                </div>
+
+                <div class="footnote">Firebase Auth handles real accounts securely.</div>
+              </div>
+            </div>
+
+            <div class="card">
+              ${cardHeader("Setup note", "If login fails immediately, check Firebase config + hosting.")}
+              <div class="card-body">
+                <div class="tiny">
+                  Make sure you pasted your <b>firebaseConfig</b> and opened this site from a web host (not file://).
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        $("#loginBtn").onclick = async () => {
+          const email = $("#loginEmail").value.trim();
+          const pass = $("#loginPass").value;
+          try{
+            await signInWithEmailAndPassword(auth, email, pass);
+            toast("Logged in", "Welcome back!");
+          }catch(e){
+            toast("Login failed", e?.message || "Check email/password.");
+          }
+        };
+
+        $("#registerBtn").onclick = async () => {
+          const email = $("#regEmail").value.trim();
+          const pass = $("#regPass").value;
+          if(pass.length < 6){
+            toast("Weak password", "Firebase requires at least 6 characters.");
+            return;
+          }
+          try{
+            await createUserWithEmailAndPassword(auth, email, pass);
+            toast("Account created", "You’re logged in.");
+          }catch(e){
+            toast("Register failed", e?.message || "Could not create account.");
+          }
+        };
+
+        return;
+      }
+
+      const avatarStyle = profile?.avatarUrl ? `style="background-image:url('${escapeHTML(profile.avatarUrl)}')"` : "";
+      const bannerStyle = profile?.bannerUrl ? `style="background-image:url('${escapeHTML(profile.bannerUrl)}')"` : "";
+
+      app.innerHTML = `
+        <div class="profile">
+          <div class="banner" ${bannerStyle}></div>
+          <div class="profile-inner">
+            <div class="avatar" ${avatarStyle}></div>
+            <div class="profile-meta" style="flex:1">
+              <h3>${escapeHTML(profile?.username || "user")}</h3>
+              <div class="tiny" style="margin-top:4px">Email: ${escapeHTML(authUser.email || "")}</div>
+              <div class="line" style="margin-top:10px">${escapeHTML(profile?.bio || "No bio yet. Add one below!")}</div>
+            </div>
+            <div class="inline-actions">
+              <button class="btn secondary" id="logoutBtn">Log out</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="grid2">
+          <div class="card">
+            ${cardHeader("Customise Profile", "Avatar, banner, bio, socials.")}
+            <div class="card-body">
+              <label>Username</label>
+              <input id="uName" maxlength="20" value="${escapeHTML(profile?.username || "")}" />
+
+              <label>Avatar URL</label>
+              <input id="aUrl" placeholder="https://…" value="${escapeHTML(profile?.avatarUrl || "")}" />
+
+              <label>Banner URL</label>
+              <input id="bUrl" placeholder="https://…" value="${escapeHTML(profile?.bannerUrl || "")}" />
+
+              <label>Bio</label>
+              <textarea id="bio">${escapeHTML(profile?.bio || "")}</textarea>
+
+              <div class="sep"></div>
+              <h3 style="margin:0 0 10px; font-size:14px; font-weight:900">Socials</h3>
+
+              <label>Discord</label>
+              <input id="sDiscord" value="${escapeHTML(profile?.socials?.discord || "")}" />
+
+              <label>X / Twitter URL</label>
+              <input id="sX" placeholder="https://x.com/you" value="${escapeHTML(profile?.socials?.x || "")}" />
+
+              <label>AniList URL</label>
+              <input id="sAni" placeholder="https://anilist.co/user/you" value="${escapeHTML(profile?.socials?.anilist || "")}" />
+
+              <label>MyAnimeList URL</label>
+              <input id="sMal" placeholder="https://myanimelist.net/profile/you" value="${escapeHTML(profile?.socials?.mal || "")}" />
+
+              <div class="row" style="margin-top:12px;justify-content:flex-end">
+                <button class="btn" id="saveProfile">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            ${cardHeader("Security", "Change password (Firebase).")}
+            <div class="card-body">
+              <div class="post">
+                <h3 style="margin:0 0 8px">Change password</h3>
+                <label>New password</label>
+                <input id="newPass" type="password" placeholder="••••••••" />
+                <div class="row" style="margin-top:12px;justify-content:flex-end">
+                  <button class="btn secondary" id="changePassword">Update</button>
+                </div>
+                <div class="footnote">If this fails, Firebase may require a recent login.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      $("#logoutBtn").onclick = async () => {
+        await signOut(auth);
+        toast("Logged out", "See you next time.");
+      };
+
+      $("#saveProfile").onclick = async () => {
+        try{
+          const ref = doc(db, "users", authUser.uid);
+          await updateDoc(ref, {
+            username: $("#uName").value.trim() || profile.username,
+            avatarUrl: $("#aUrl").value.trim(),
+            bannerUrl: $("#bUrl").value.trim(),
+            bio: $("#bio").value.trim(),
+            socials: {
+              discord: $("#sDiscord").value.trim(),
+              x: $("#sX").value.trim(),
+              anilist: $("#sAni").value.trim(),
+              mal: $("#sMal").value.trim(),
+            }
+          });
+          await ensureProfile(authUser);
+          toast("Saved", "Profile updated.");
+          render();
+        }catch(e){
+          toast("Save failed", e?.message || "Could not update profile.");
+        }
+      };
+
+      $("#changePassword").onclick = async () => {
+        const np = $("#newPass").value;
+        if(np.length < 6){
+          toast("Too short", "Firebase requires at least 6 characters.");
+          return;
+        }
+        try{
+          await updatePassword(authUser, np);
+          toast("Updated", "Password changed.");
+          $("#newPass").value = "";
+        }catch(e){
+          toast("Couldn’t update", e?.message || "Try logging in again then retry.");
+        }
+      };
+    }
+
+    // =========================
+    // Actions (expand + CRUD)
+    // =========================
+    function attachExpandHandlers(){
+      $$("#app [data-action='toggle']").forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.dataset.id;
+          const ns = btn.dataset.ns;
+          const expanded = btn.textContent.trim().toLowerCase() === "collapse";
+
+          if(ns === "blog"){
+            const p = blogPosts.find(x => x.id === id);
+            if(!p) return;
+            const el = $(`#app [data-content="${CSS.escape(id)}"]`);
+            el.textContent = expanded ? shortText(p.content, 240).short : (p.content || "");
+            btn.textContent = expanded ? "Expand" : "Collapse";
+          }
+
+          if(ns === "forum"){
+            const t = forumThreads.find(x => x.id === id);
+            if(!t) return;
+            const el = $(`#app [data-content="${CSS.escape(id)}"]`);
+            el.textContent = expanded ? shortText(t.content, 240).short : (t.content || "");
+            btn.textContent = expanded ? "Expand" : "Collapse";
+          }
+        };
+      });
+    }
+
+    function attachBlogActions(){
+      $$("[data-action='like-blog']").forEach(btn => {
+        btn.onclick = async () => {
+          if(!authUser){ toast("Login required", "Log in to like posts."); return; }
+          const id = btn.dataset.id;
+          const p = blogPosts.find(x => x.id === id);
+          if(!p) return;
+
+          const nextLikes = toggleLikeMap(p.likes, authUser.uid);
+          try{
+            await updateDoc(doc(db, "blogPosts", id), { likes: nextLikes });
+          }catch{
+            toast("Error", "Couldn’t update like.");
+          }
+        };
+      });
+
+      $$("[data-action='delete-blog']").forEach(btn => {
+        btn.onclick = async () => {
+          if(!authUser) return;
+          const id = btn.dataset.id;
+          const p = blogPosts.find(x => x.id === id);
+          if(!p) return;
+          if(p.authorId !== authUser.uid){ toast("Not allowed", "Only the author can delete."); return; }
+
+          try{
+            await deleteDoc(doc(db, "blogPosts", id));
+            toast("Deleted", "Post removed.");
+          }catch{
+            toast("Error", "Couldn’t delete post.");
+          }
+        };
+      });
+
+      $$("[data-action='edit-blog']").forEach(btn => {
+        btn.onclick = () => {
+          if(!authUser) return;
+          const id = btn.dataset.id;
+          const p = blogPosts.find(x => x.id === id);
+          if(!p) return;
+          if(p.authorId !== authUser.uid){ toast("Not allowed", "Only the author can edit."); return; }
+
+          openModal("Edit Blog Post", `
+            <form id="blogEditForm">
+              <label>Title</label>
+              <input id="ebTitle" required maxlength="90" value="${escapeHTML(p.title || "")}" />
+              <label>Post</label>
+              <textarea id="ebContent" required maxlength="5000">${escapeHTML(p.content || "")}</textarea>
+              <div class="row" style="margin-top:12px;justify-content:flex-end">
+                <button class="btn secondary" type="button" id="cancelEditBlog">Cancel</button>
+                <button class="btn" type="submit">Save</button>
+              </div>
+            </form>
+          `);
+
+          $("#cancelEditBlog").onclick = closeModal;
+
+          $("#blogEditForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const title = $("#ebTitle").value.trim();
+            const content = $("#ebContent").value.trim();
+            if(!title || !content){ toast("Missing info", "Title and content are required."); return; }
+
+            try{
+              await updateDoc(doc(db, "blogPosts", id), {
+                title,
+                content,
+                editedAt: serverTimestamp()
+              });
+              closeModal();
+              toast("Saved", "Post updated.");
+            }catch{
+              toast("Error", "Couldn’t update post.");
+            }
+          };
+        };
+      });
+    }
+
+    function attachForumActions(){
+      $$("[data-action='upvote-thread']").forEach(btn => {
+        btn.onclick = async () => {
+          if(!authUser){ toast("Login required", "Log in to upvote."); return; }
+          const id = btn.dataset.id;
+          const t = forumThreads.find(x => x.id === id);
+          if(!t) return;
+
+          const next = toggleLikeMap(t.upvotes, authUser.uid);
+          try{
+            await updateDoc(doc(db, "forumThreads", id), { upvotes: next });
+          }catch{
+            toast("Error", "Couldn’t update upvote.");
+          }
+        };
+      });
+
+      $$("[data-comment-btn]").forEach(btn => {
+        btn.onclick = async () => {
+          if(!authUser){ toast("Login required", "Log in to comment."); return; }
+          const threadId = btn.dataset.commentBtn;
+          const t = forumThreads.find(x => x.id === threadId);
+          if(!t) return;
+
+          const input = $(`[data-comment-text="${CSS.escape(threadId)}"]`);
+          const text = (input?.value || "").trim();
+          if(!text){ toast("Empty comment", "Write something first."); return; }
+
+          const comments = Array.isArray(t.comments) ? t.comments.slice() : [];
+          comments.push({
+            id: crypto.randomUUID(),
+            text,
+            authorId: authUser.uid,
+            authorName: profile?.username || "user",
+            createdAt: serverTimestamp(),
+            editedAt: null,
+            upvotes: {}
+          });
+
+          try{
+            await updateDoc(doc(db, "forumThreads", threadId), { comments });
+            toast("Comment posted", "Your reply is live.");
+          }catch{
+            toast("Error", "Couldn’t post comment.");
+          }
+        };
+      });
+
+      $$("[data-action='delete-thread']").forEach(btn => {
+        btn.onclick = async () => {
+          if(!authUser) return;
+          const id = btn.dataset.id;
+          const t = forumThreads.find(x => x.id === id);
+          if(!t) return;
+          if(t.authorId !== authUser.uid){ toast("Not allowed", "Only the author can delete."); return; }
+
+          try{
+            await deleteDoc(doc(db, "forumThreads", id));
+            toast("Deleted", "Thread removed.");
+          }catch{
+            toast("Error", "Couldn’t delete thread.");
+          }
+        };
+      });
+
+      $$("[data-action='edit-thread']").forEach(btn => {
+        btn.onclick = () => {
+          if(!authUser) return;
+          const id = btn.dataset.id;
+          const t = forumThreads.find(x => x.id === id);
+          if(!t) return;
+          if(t.authorId !== authUser.uid){ toast("Not allowed", "Only the author can edit."); return; }
+
+          openModal("Edit Thread", `
+            <form id="threadEditForm">
+              <label>Title</label>
+              <input id="etTitle" required maxlength="90" value="${escapeHTML(t.title || "")}" />
+              <label>Category</label>
+              <input id="etCat" maxlength="30" value="${escapeHTML(t.category || "General")}" />
+              <label>Opening post</label>
+              <textarea id="etContent" required maxlength="5000">${escapeHTML(t.content || "")}</textarea>
+              <div class="row" style="margin-top:12px;justify-content:flex-end">
+                <button class="btn secondary" type="button" id="cancelEditThread">Cancel</button>
+                <button class="btn" type="submit">Save</button>
+              </div>
+            </form>
+          `);
+
+          $("#cancelEditThread").onclick = closeModal;
+
+          $("#threadEditForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const title = $("#etTitle").value.trim();
+            const category = $("#etCat").value.trim() || "General";
+            const content = $("#etContent").value.trim();
+            if(!title || !content){ toast("Missing info", "Title/content required."); return; }
+
+            try{
+              await updateDoc(doc(db, "forumThreads", id), {
+                title,
+                category,
+                content,
+                editedAt: serverTimestamp()
+              });
+              closeModal();
+              toast("Saved", "Thread updated.");
+            }catch{
+              toast("Error", "Couldn’t update thread.");
+            }
+          };
+        };
+      });
+
+      $$("[data-action='upvote-comment']").forEach(btn => {
+        btn.onclick = async () => {
+          if(!authUser){ toast("Login required", "Log in to upvote."); return; }
+          const threadId = btn.dataset.threadId;
+          const commentId = btn.dataset.commentId;
+          const t = forumThreads.find(x => x.id === threadId);
+          if(!t) return;
+
+          const comments = Array.isArray(t.comments) ? t.comments.slice() : [];
+          const idx = comments.findIndex(c => c.id === commentId);
+          if(idx < 0) return;
+
+          comments[idx] = {
+            ...comments[idx],
+            upvotes: toggleLikeMap(comments[idx].upvotes, authUser.uid)
+          };
+
+          try{
+            await updateDoc(doc(db, "forumThreads", threadId), { comments });
+          }catch{
+            toast("Error", "Couldn’t update upvote.");
+          }
+        };
+      });
+
+      $$("[data-action='delete-comment']").forEach(btn => {
+        btn.onclick = async () => {
+          if(!authUser) return;
+          const threadId = btn.dataset.threadId;
+          const commentId = btn.dataset.commentId;
+          const t = forumThreads.find(x => x.id === threadId);
+          if(!t) return;
+
+          const comments = Array.isArray(t.comments) ? t.comments.slice() : [];
+          const c = comments.find(x => x.id === commentId);
+          if(!c) return;
+          if(c.authorId !== authUser.uid){ toast("Not allowed", "Only the author can delete."); return; }
+
+          const next = comments.filter(x => x.id !== commentId);
+          try{
+            await updateDoc(doc(db, "forumThreads", threadId), { comments: next });
+            toast("Deleted", "Comment removed.");
+          }catch{
+            toast("Error", "Couldn’t delete comment.");
+          }
+        };
+      });
+
+      $$("[data-action='edit-comment']").forEach(btn => {
+        btn.onclick = () => {
+          if(!authUser) return;
+          const threadId = btn.dataset.threadId;
+          const commentId = btn.dataset.commentId;
+          const t = forumThreads.find(x => x.id === threadId);
+          if(!t) return;
+
+          const c = (t.comments || []).find(x => x.id === commentId);
+          if(!c) return;
+          if(c.authorId !== authUser.uid){ toast("Not allowed", "Only the author can edit."); return; }
+
+          openModal("Edit Comment", `
+            <form id="commentEditForm">
+              <label>Comment</label>
+              <textarea id="ecText" required maxlength="800">${escapeHTML(c.text || "")}</textarea>
+              <div class="row" style="margin-top:12px;justify-content:flex-end">
+                <button class="btn secondary" type="button" id="cancelEditComment">Cancel</button>
+                <button class="btn" type="submit">Save</button>
+              </div>
+            </form>
+          `);
+
+          $("#cancelEditComment").onclick = closeModal;
+
+          $("#commentEditForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const text = $("#ecText").value.trim();
+            if(!text){ toast("Empty", "Comment can’t be empty."); return; }
+
+            const comments = Array.isArray(t.comments) ? t.comments.slice() : [];
+            const idx = comments.findIndex(x => x.id === commentId);
+            if(idx < 0) return;
+
+            comments[idx] = {
+              ...comments[idx],
+              text,
+              editedAt: serverTimestamp()
+            };
+
+            try{
+              await updateDoc(doc(db, "forumThreads", threadId), { comments });
+              closeModal();
+              toast("Saved", "Comment updated.");
+            }catch{
+              toast("Error", "Couldn’t update comment.");
+            }
+          };
+        };
+      });
+    }
+
+    // =========================
+    // Render router
+    // =========================
+    function render(){
+      const route = currentRoute();
+      setActiveTab(route);
+      closeModal();
+
+      switch(route){
+        case "home": renderHome(); break;
+        case "blog": renderBlog(); break;
+        case "forum": renderForum(); break;
+        case "news": renderNews(); break;
+        case "account": renderAccount(); break;
+        default: renderHome();
+      }
+    }
+
+    function bindNav(){
+      $("#logoBtn").onclick = () => navigate("home");
+      $$(".tab").forEach(t => t.onclick = () => navigate(t.dataset.route));
+      window.addEventListener("hashchange", render);
+    }
+
+    // Boot
+    initSplash();
+    bindNav();
+    bindModal();
+    if(!location.hash) location.hash = "#home";
+    render();
+  </script>
+</body>
+</html>
